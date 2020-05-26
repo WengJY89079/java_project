@@ -6,6 +6,9 @@ import edu.uci.ics.crawler4j.robotstxt.*;
 import javax.swing.text.html.HTMLDocument.Iterator;
 import java.util.*;
 import java.net.URL;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.File;
@@ -17,6 +20,16 @@ public class Controller {
 	public static void saveImage ( String imageUrl ) throws IOException {
 		URL url = new URL ( imageUrl );
 		String fileName = url.getFile ( );
+		
+		Path check_figures = Paths.get("./figures");
+		if ( !Files.exists( check_figures ) ) {
+			System.out.println("./figures create");
+			Files.createDirectory(check_figures);
+		}
+		else {
+			System.out.println("./figures exist");
+		}
+		
 		String destName = "./figures" + fileName.substring ( fileName.lastIndexOf ( "/" ) );
 		System.out.println ( destName );
 

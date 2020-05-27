@@ -18,15 +18,6 @@ public class Controller {
 		URL url = new URL ( imageUrl );
 		String fileName = url.getFile ( );
 
-		Path check_figures = Paths.get ( "./figures" );
-		if ( !Files.exists ( check_figures ) ) {
-			System.out.println ( "./figures create" );
-			Files.createDirectory ( check_figures );
-		}
-		else {
-			System.out.println ( "./figures exist" );
-		}
-
 		String destName = "./figures" + fileName.substring ( fileName.lastIndexOf ( "/" ) );
 		System.out.println ( destName );
 
@@ -44,17 +35,17 @@ public class Controller {
 		os.close ( );
 	}
 
-	public static void main ( String[] args ) throws Exception {
+	public void searchPic ( String keyword ) throws Exception {
 
 		List < String > seedNext = new ArrayList < String > ( );
 
-		Scanner input = new Scanner ( System.in );
-		System.out.println ( "input Keyword : " );
-		String searchString;
+		//Scanner input = new Scanner ( System.in );
+		//System.out.println ( "input Keyword : " );
+		//String searchString;
 		String crawlStorageFolder = "./data/crawl/root";
 		int numberOfCrawlers = 1;
 
-		searchString = input.nextLine ( );
+		//searchString = input.nextLine ( );
 
 		CrawlConfig config = new CrawlConfig ( );
 		config.setCrawlStorageFolder ( crawlStorageFolder );
@@ -64,15 +55,25 @@ public class Controller {
 		RobotstxtServer robotstxtserver = new RobotstxtServer ( robotstxtconfig, pageFetcher );
 		CrawlController controller = new CrawlController ( config, pageFetcher, robotstxtserver );
 
-		controller.addSeed ( "https://www.ptt.cc/bbs/C_Chat/search?q=" + searchString );
+		controller.addSeed ( "https://www.ptt.cc/bbs/C_Chat/search?q=" + keyword );
 
 		controller.start ( myCrawler.class , numberOfCrawlers );
 
 		seedNext = myCrawler.seed;
 		java.util.Iterator < String > iterator = seedNext.iterator ( );
+		// Is /figures exist?
+		Path check_figures = Paths.get ( "./figures" );
+		if ( !Files.exists ( check_figures ) ) {
+			System.out.println ( "./figures create" );
+			Files.createDirectory ( check_figures );
+		}
+		else {
+			System.out.println ( "./figures exist" );
+		}
+		
 		while ( iterator.hasNext ( ) ) {
 			String outputString = iterator.next ( );
-			try {
+			try {	
 				saveImage ( outputString );
 			}
 			catch ( IOException e ) {

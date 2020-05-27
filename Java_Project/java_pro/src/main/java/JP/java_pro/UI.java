@@ -1,6 +1,7 @@
 package JP.java_pro;
 
 import javax.swing.JFrame;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -26,7 +27,7 @@ public class UI extends JFrame implements Ibase {
 
         // set events 
         this.searchBtn.addActionListener ( act -> this.search ( this.inputBox.getText ( ) ) );
-
+        		
         // add components 
         this.add ( searchBtn );
         this.add ( inputBox );
@@ -38,6 +39,13 @@ public class UI extends JFrame implements Ibase {
     private void search ( String keywords ) {
         // do search 
         System.out.println ( "SEARCH : " + keywords );
+        Controller main_controller = new Controller();
+        try {
+        	main_controller.searchPic(keywords);
+        }
+        catch ( Exception e ) {
+			System.out.println ( e );
+		}
     }
 
     private JButton searchBtn = new JButton ( "Search" );

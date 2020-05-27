@@ -3,7 +3,6 @@ package JP.java_pro;
 import edu.uci.ics.crawler4j.crawler.*;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.robotstxt.*;
-import javax.swing.text.html.HTMLDocument.Iterator;
 import java.util.*;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -11,8 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -20,16 +17,16 @@ public class Controller {
 	public static void saveImage ( String imageUrl ) throws IOException {
 		URL url = new URL ( imageUrl );
 		String fileName = url.getFile ( );
-		
-		Path check_figures = Paths.get("./figures");
-		if ( !Files.exists( check_figures ) ) {
-			System.out.println("./figures create");
-			Files.createDirectory(check_figures);
+
+		Path check_figures = Paths.get ( "./figures" );
+		if ( !Files.exists ( check_figures ) ) {
+			System.out.println ( "./figures create" );
+			Files.createDirectory ( check_figures );
 		}
 		else {
-			System.out.println("./figures exist");
+			System.out.println ( "./figures exist" );
 		}
-		
+
 		String destName = "./figures" + fileName.substring ( fileName.lastIndexOf ( "/" ) );
 		System.out.println ( destName );
 
@@ -48,8 +45,6 @@ public class Controller {
 	}
 
 	public static void main ( String[] args ) throws Exception {
-
-		
 
 		List < String > seedNext = new ArrayList < String > ( );
 

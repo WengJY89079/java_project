@@ -3,7 +3,6 @@ package JP.java_pro;
 import javax.swing.JFrame;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 public class UI extends JFrame implements Ibase {

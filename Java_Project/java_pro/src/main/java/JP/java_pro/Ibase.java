@@ -10,5 +10,4 @@ public interface Ibase {
         btn.setLocation ( x , y );
         btn.setSize ( 100 , height );
     }
-
 }

@@ -5,10 +5,14 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.*;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Iterator;
 
 import javax.swing.event.*;
@@ -120,13 +124,23 @@ public class UI extends JFrame implements Ibase {
             if ( pic_index < myCrawler.seed.size ( ) - 1 ) {
                 pic_index++;
                 try {
-                    this.picture = new ImageIcon ( new URL ( myCrawler.seed.get ( pic_index ) ) );
+                    this.picture = pictureNext;
                     this.picture.setImage ( picture.getImage ( ).getScaledInstance ( showPictureJLabel.getWidth ( ) , showPictureJLabel.getHeight ( ) , Image.SCALE_DEFAULT ) );
                     this.showPictureJLabel.setIcon ( picture );
+                    if(pic_index-1>=0) {
+                    	this.picturePre = returnIcon ( new URL ( myCrawler.seed.get ( pic_index-1 ) ) );
+                    }
+                    if(pic_index+1 < myCrawler.seed.size ( ) - 1) {
+                    	this.pictureNext = returnIcon ( new URL ( myCrawler.seed.get ( pic_index+1 ) ) );
+                    }
+                    
                 }
                 catch ( MalformedURLException e1 ) {
                     e1.printStackTrace ( );
-                }
+                } 
+                catch ( IOException e1 ) {
+					e1.printStackTrace ( );
+				}
             }
         } );
         //back to main MENU
@@ -148,13 +162,22 @@ public class UI extends JFrame implements Ibase {
             if ( pic_index > 0 ) {
                 pic_index--;
                 try {
-                    this.picture = new ImageIcon ( new URL ( myCrawler.seed.get ( pic_index ) ) );
+                    this.picture = picturePre;
                     this.picture.setImage ( picture.getImage ( ).getScaledInstance ( showPictureJLabel.getWidth ( ) , showPictureJLabel.getHeight ( ) , Image.SCALE_DEFAULT ) );
                     this.showPictureJLabel.setIcon ( picture );
+                    if(pic_index-1>=0) {
+                    	this.picturePre = returnIcon( new URL ( myCrawler.seed.get ( pic_index - 1 ) ) );
+                    }
+                    if(pic_index+1 < myCrawler.seed.size ( ) - 1) {
+                    	this.pictureNext = returnIcon( new URL ( myCrawler.seed.get ( pic_index + 1 ) ) );
+                    }
                 }
                 catch ( MalformedURLException e1 ) {
                     e1.printStackTrace ( );
-                }
+                } 
+                catch ( IOException e1 ) {
+					e1.printStackTrace( );
+				}
             }
         } );
 
@@ -206,9 +229,16 @@ public class UI extends JFrame implements Ibase {
         this.showPictureJLabel.setVisible ( true );
         if ( myCrawler.seed.size ( ) != 0 ) {
             try {
-                this.picture = new ImageIcon ( new URL ( myCrawler.seed.get ( pic_index ) ) );
+            	url = new URL ( myCrawler.seed.get ( pic_index ) );
+            	
+                this.picture = returnIcon(url);
                 this.picture.setImage ( picture.getImage ( ).getScaledInstance ( showPictureJLabel.getWidth ( ) , showPictureJLabel.getHeight ( ) , Image.SCALE_DEFAULT ) );
                 this.showPictureJLabel.setIcon ( picture );
+                if(pic_index+1 < myCrawler.seed.size ( ) - 1) {
+                	this.pictureNext = new ImageIcon ( new URL ( myCrawler.seed.get ( pic_index +1) ) );
+                	//this.pictureNext.setImage ( picture.getImage ( ).getScaledInstance ( showPictureJLabel.getWidth ( ) , showPictureJLabel.getHeight ( ) , Image.SCALE_DEFAULT ) );
+                	//this.showPictureJLabel.setIcon ( picture );
+                }
             }
             catch ( Exception e ) {
                 e.printStackTrace ( );
@@ -217,6 +247,23 @@ public class UI extends JFrame implements Ibase {
         else {
             System.out.println ( "no pic" );
         }
+    }
+    
+    //for some fxxking 404, we need something
+    
+    public ImageIcon returnIcon( URL url ) throws IOException {
+    	URLConnection connection = url.openConnection();
+    	connection.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+    	InputStream in = connection.getInputStream();
+    	ByteArrayOutputStream out = new ByteArrayOutputStream();
+    	
+    	int c;
+        while ((c = in.read()) != -1) {
+        	out.write(c);
+        }
+    	
+        ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit().createImage(out.toByteArray()));
+        return icon;
     }
 
     /**
@@ -240,12 +287,17 @@ public class UI extends JFrame implements Ibase {
     private JLabel showPictureJLabel = new JLabel ( );
     private ImageIcon loadIcon = new ImageIcon ( "./icon/icon.gif" );
     private ImageIcon picture = new ImageIcon ( );
+    private ImageIcon picturePre = new ImageIcon ( );
+    private ImageIcon pictureNext = new ImageIcon ( );
     private JLabel loadingJLabel;
     private JButton nextButton = new JButton ( "Next Picture" );
     private JButton saveButton = new JButton ( "Save Picture" );
     private JButton preButton = new JButton ( "Previous Picture" );
     private JButton backButton = new JButton ( "Back to MENU" );
     // 搜尋相關 components
+    
+    private URL url;
+
     private ButtonGroup radioBtnGrp = new ButtonGroup ( );
     private JRadioButton searchByKeywords = new JRadioButton ( "Keywords" );
     private JRadioButton searchByAuthor = new JRadioButton ( "Author" );

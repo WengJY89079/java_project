@@ -41,12 +41,12 @@ public class myCrawler extends WebCrawler{
 					
 					String prelink = nextLinkUrl.split("&")[0];
 					
-					if (prelink.equals("https://www.ptt.cc/bbs/C_Chat/search?page=" + Page)) {
+					if (prelink.equals("https://www.ptt.cc/bbs/C_Chat/search?page=" + Page) ) {
 						System.out.println("*****************");
-						System.out.println("Find previous Page : " + nextLinkUrl);
+						System.out.println("Find same topic previous Page : " + nextLinkUrl);
 						Page += 1;
+						this.myController.addSeed(nextLinkUrl);
 					}
-					this.myController.addSeed(nextLinkUrl);
 				}
 			}
 		}

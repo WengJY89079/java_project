@@ -5,6 +5,7 @@ import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.robotstxt.*;
 import java.util.*;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,12 +56,15 @@ public class Controller extends Thread {
 
 	public static void saveImage ( String imageUrl ) throws IOException {
 		URL url = new URL ( imageUrl );
+		URLConnection connection = url.openConnection( );
+		connection.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+		connection.connect();
 		String fileName = url.getFile ( );
 
 		String destName = "./figures" + fileName.substring ( fileName.lastIndexOf ( "/" ) );
 		System.out.println ( destName );
 
-		InputStream is = url.openStream ( );
+		InputStream is = connection.getInputStream();
 		OutputStream os = new FileOutputStream ( destName );
 
 		byte[] b = new byte[2048];
@@ -69,7 +73,6 @@ public class Controller extends Thread {
 		while ( ( length = is.read ( b ) ) != -1 ) {
 			os.write ( b , 0 , length );
 		}
-
 		is.close ( );
 		os.close ( );
 	}

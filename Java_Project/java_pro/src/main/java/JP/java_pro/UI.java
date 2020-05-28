@@ -21,7 +21,13 @@ import org.w3c.dom.events.MouseEvent;
 
 public class UI extends JFrame implements Ibase {
 
-    // constructor, title, size
+    /**
+     * constructor, title, size
+     * 
+     * @param title
+     * @param width
+     * @param height
+     */
     public UI ( String title, int width, int height ) {
         // call parent ctor 
         super ( title );
@@ -30,6 +36,13 @@ public class UI extends JFrame implements Ibase {
         this.setSize ( width , height );
         this.setDefaultCloseOperation ( JFrame.EXIT_ON_CLOSE );
         this.setLayout ( null );
+
+        // init 目前下載位置的 Label 以及 change button 
+        Ibase.initBtn ( this.changeDestDir , 60 , 30 , 10 , height - 60 );
+        Ibase.initLabel ( this.destPathLabel , 100 , 30 , 80 , height - 60 );
+        Ibase.initLabel ( this.currentDestDir , 1000 , 30 , 170 , height - 60 , Controller.destDir );
+
+        this.changeDestDir.addActionListener ( act -> this.changeSaveDir ( ) );
 
         // init search button and radio button 
         Ibase.initBtn ( this.searchBtn , 100 , 30 , width - 150 , 100 );
@@ -68,6 +81,7 @@ public class UI extends JFrame implements Ibase {
 
         // set events
         this.searchBtn.addActionListener ( act -> {
+            changeDestDir.setEnabled ( false );
             inputBox.setVisible ( false );
             searchBtn.setVisible ( false );
             searchByKeywords.setVisible ( false );
@@ -145,6 +159,10 @@ public class UI extends JFrame implements Ibase {
         } );
 
         // add components 
+        this.add ( destPathLabel );
+        this.add ( currentDestDir );
+        this.add ( changeDestDir );
+
         this.add ( searchBtn );
         this.add ( inputBox );
         this.add ( loadingJLabel );
@@ -175,8 +193,11 @@ public class UI extends JFrame implements Ibase {
         main_controller = new Controller ( this, keywords, mode );
     }
 
-    //finishCraw, show button for control picture(next, pre, backToMENU, save)
+    /**
+     * finishCraw, show button for control picture(next, pre, backToMENU, save)
+     */
     public void finishCraw ( ) {
+        this.changeDestDir.setEnabled(true);
         this.loadingJLabel.setVisible ( false );
         this.nextButton.setVisible ( true );
         this.saveButton.setVisible ( true );
@@ -198,23 +219,45 @@ public class UI extends JFrame implements Ibase {
         }
     }
 
+    /**
+     * use file browser to choose default img save path
+     */
+    public void changeSaveDir ( ) {
+        String newPath = Ibase.chooseDir ( this );
+        if ( !newPath.equals ( "CANCEL" ) ) {
+            // change dest dir 
+            Controller.destDir = newPath;
+            // show new path 
+            this.currentDestDir.setText ( Controller.destDir );
+        }
+    }
+
+    /* Method END  */
+
+    // 
     private Controller main_controller = null;
     private int pic_index = 0;
     private JLabel showPictureJLabel = new JLabel ( );
     private ImageIcon loadIcon = new ImageIcon ( "./icon/icon.gif" );
     private ImageIcon picture = new ImageIcon ( );
-    private JButton searchBtn = new JButton ( "Search" );
     private JLabel loadingJLabel;
-    private JTextField inputBox = new JTextField ( "Enter Search Keywords Here !", 200 );
     private JButton nextButton = new JButton ( "Next Picture" );
     private JButton saveButton = new JButton ( "Save Picture" );
     private JButton preButton = new JButton ( "Previous Picture" );
     private JButton backButton = new JButton ( "Back to MENU" );
-
+    // 搜尋相關 components
     private ButtonGroup radioBtnGrp = new ButtonGroup ( );
     private JRadioButton searchByKeywords = new JRadioButton ( "Keywords" );
     private JRadioButton searchByAuthor = new JRadioButton ( "Author" );
 
+    private JTextField inputBox = new JTextField ( "Enter Search Keywords Here !", 200 );
+    private JButton searchBtn = new JButton ( "Search" );
+
     public static final int SearchKeywords = 0;
     public static final int SearchAuthor = 1;
+
+    // Default path 
+    private JButton changeDestDir = new JButton ( "更改" );
+    private JLabel destPathLabel = new JLabel ( "目前下載目錄 : " );
+    private JLabel currentDestDir = new JLabel ( );
 }

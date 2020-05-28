@@ -14,6 +14,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class Controller extends Thread {
+	public static String destDir = System.getProperty ( "user.dir" ) + "/Images/";
+
 	public UI ui;
 	public int mode = 0;
 	public String keywords;
@@ -42,7 +44,7 @@ public class Controller extends Thread {
 	private void init ( ) throws Exception {
 
 		seedNext = new ArrayList < String > ( );
-		crawlStorageFolder = "./data/crawl/root";
+		crawlStorageFolder = System.getProperty ( "user.dir" ) + "/CrawlerDatas/";
 		numberOfCrawlers = 1;
 		config = new CrawlConfig ( );
 		config.setCrawlStorageFolder ( crawlStorageFolder );
@@ -57,8 +59,8 @@ public class Controller extends Thread {
 		URL url = new URL ( imageUrl );
 		String fileName = url.getFile ( );
 
-		String destName = "./figures" + fileName.substring ( fileName.lastIndexOf ( "/" ) );
-		System.out.println ( destName );
+		String destName = Controller.destDir + fileName.substring ( fileName.lastIndexOf ( "/" ) );
+		// System.out.println ( destName );
 
 		InputStream is = url.openStream ( );
 		OutputStream os = new FileOutputStream ( destName );
@@ -83,15 +85,17 @@ public class Controller extends Thread {
 		// search author 
 		else if ( mode == 1 )
 			controller.addSeed ( "https://www.ptt.cc/bbs/C_Chat/search?q=author:" + keywords );
-			
+
 		controller.start ( myCrawler.class , numberOfCrawlers );
 
 		seedNext = myCrawler.seed;
 		java.util.Iterator < String > iterator = seedNext.iterator ( );
+
 		// Is /figures exist?
-		Path check_figures = Paths.get ( "./figures" );
+		Path check_figures = Paths.get ( destDir );
+
 		if ( !Files.exists ( check_figures ) ) {
-			System.out.println ( "./figures create" );
+			System.out.println ( "create : " + destDir );
 			try {
 				Files.createDirectory ( check_figures );
 			}
@@ -99,9 +103,6 @@ public class Controller extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace ( );
 			}
-		}
-		else {
-			System.out.println ( "./figures exist" );
 		}
 
 		ui.finishCraw ( );

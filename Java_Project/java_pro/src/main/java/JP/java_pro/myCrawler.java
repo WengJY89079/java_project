@@ -1,6 +1,11 @@
 package JP.java_pro;
 
 import java.util.regex.Pattern;
+import javax.sound.sampled.LineListener;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.IconifyAction;
+
+import edu.uci.ics.crawler4j.crawler.CrawlConfig;
+import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
@@ -29,7 +34,7 @@ public class myCrawler extends WebCrawler{
 			Iterator<WebURL> linkIterator = links.iterator();
 			while ( linkIterator.hasNext() ) {
 				String nextLinkUrl = linkIterator.next().toString();
-				if(FILTERS.matcher(nextLinkUrl).matches()) {
+				if(FILTERS.matcher(nextLinkUrl).matches() && !nextLinkUrl.contains("bbs/C_Chat/search?q=")) {
 					seed.add(nextLinkUrl);
 				}
 				if (nextLinkUrl.contains("?page=" + Page) ) {

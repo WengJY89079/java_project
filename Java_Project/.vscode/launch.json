@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - SearchAuthor",
+            "request": "launch",
+            "mainClass": "JP.java_pro.SearchAuthor",
+            "projectName": "java_pro"
+        },
+        {
+            "type": "java",
             "name": "Debug (Launch) - Current File",
             "request": "launch",
             "mainClass": "${file}"

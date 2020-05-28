@@ -15,6 +15,7 @@ import java.io.IOException;
 
 public class Controller extends Thread {
 	public UI ui;
+	public int mode = 0;
 	public String keywords;
 	public List < String > seedNext;
 	public String crawlStorageFolder;
@@ -24,21 +25,22 @@ public class Controller extends Thread {
 	public RobotstxtConfig robotstxtconfig;
 	public RobotstxtServer robotstxtserver;
 	public CrawlController controller;
-	
+
 	// 因為要在爬蟲時同時讓 loading icon 動，所以重新設計成多線程
-	
+
 	// Controller 傳 ui 讓他能爬完蟲後去呼叫 ui
-	
-	public Controller (UI ui, String keywords) throws Exception {
+	// mode 0 = search title, mode 1 = search author
+	public Controller ( UI ui, String keywords, int mode ) throws Exception {
 		this.ui = ui;
 		this.keywords = keywords;
-		this.init();
+		this.init ( );
+		this.mode = mode;
 	}
-	
+
 	// some init and start run()
-	
-	private void init() throws Exception {
-		
+
+	private void init ( ) throws Exception {
+
 		seedNext = new ArrayList < String > ( );
 		crawlStorageFolder = "./data/crawl/root";
 		numberOfCrawlers = 1;
@@ -46,9 +48,9 @@ public class Controller extends Thread {
 		config.setCrawlStorageFolder ( crawlStorageFolder );
 		pageFetcher = new PageFetcher ( config );
 		robotstxtconfig = new RobotstxtConfig ( );
-		robotstxtserver = new RobotstxtServer ( robotstxtconfig , pageFetcher );
-		controller = new CrawlController ( config , pageFetcher , robotstxtserver );
-		this.start( );
+		robotstxtserver = new RobotstxtServer ( robotstxtconfig, pageFetcher );
+		controller = new CrawlController ( config, pageFetcher, robotstxtserver );
+		this.start ( );
 	}
 
 	public static void saveImage ( String imageUrl ) throws IOException {
@@ -71,12 +73,17 @@ public class Controller extends Thread {
 		is.close ( );
 		os.close ( );
 	}
-	
+
 	// previos main, after Crawing call ui
 
-	public void run() {
-
-		controller.addSeed ( "https://www.ptt.cc/bbs/C_Chat/search?q=" + keywords );
+	public void run ( ) {
+		// search title
+		if ( mode == 0 )
+			controller.addSeed ( "https://www.ptt.cc/bbs/C_Chat/search?q=" + keywords );
+		// search author 
+		else if ( mode == 1 )
+			controller.addSeed ( "https://www.ptt.cc/bbs/C_Chat/search?q=author:" + keywords );
+			
 		controller.start ( myCrawler.class , numberOfCrawlers );
 
 		seedNext = myCrawler.seed;
@@ -87,16 +94,17 @@ public class Controller extends Thread {
 			System.out.println ( "./figures create" );
 			try {
 				Files.createDirectory ( check_figures );
-			} catch (IOException e) {
+			}
+			catch ( IOException e ) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e.printStackTrace ( );
 			}
 		}
 		else {
 			System.out.println ( "./figures exist" );
 		}
-		
-		ui.finishCraw();
-		
+
+		ui.finishCraw ( );
+
 	}
 }

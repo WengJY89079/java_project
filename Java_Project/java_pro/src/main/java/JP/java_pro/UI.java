@@ -34,7 +34,18 @@ import javax.swing.JTextField;
 import org.w3c.dom.events.MouseEvent;
 
 public class UI extends JFrame implements Ibase {
-
+	//check if a string is a number
+	public static boolean isInteger(String s) {
+	    try { 
+	        Integer.parseInt(s); 
+	    } catch(NumberFormatException e) { 
+	        return false; 
+	    } catch(NullPointerException e) {
+	        return false;
+	    }
+	    // only got here if we didn't return false
+	    return true;
+	}
     /**
      * constructor, title, size
      * 
@@ -103,10 +114,16 @@ public class UI extends JFrame implements Ibase {
         this.showPictureJLabel.setVisible ( false );
         
         //display picture page
-        this.picPageLJLabel.setSize(50, 50);
+        this.picPageLJLabel.setSize(30, 20);
         this.picPageLJLabel.setLocation(width-100, 300);
         this.picPageLJLabel.setVisible(false);
         this.picPageLJLabel.setText("");
+        this.gotoPage.setSize(80,20);
+        this.gotoPage.setLocation(width-100,280);
+        this.gotoPage.setVisible(false);
+        this.gotoThis.setSize(45, 20);
+        this.gotoThis.setLocation( width-65, 300 );
+        this.gotoThis.setVisible(false);
 
         // set events
         this.searchBtn.addActionListener ( act -> {
@@ -144,6 +161,51 @@ public class UI extends JFrame implements Ibase {
                 e1.printStackTrace ( );
             }
         } );
+        //gotoPage
+        this.gotoPage.addActionListener( act ->{
+        	if (isInteger(gotoThis.getText())) {
+        		try {
+        			if(Integer.parseInt(gotoThis.getText())-1 > 0 && Integer.parseInt(gotoThis.getText())-1 < myCrawler.seed.size() ) {
+        				pic_index = Integer.parseInt(gotoThis.getText())-1;
+        			}
+        			else if (Integer.parseInt(gotoThis.getText()) <= 0) {
+        				pic_index = 0;
+        			}
+        			else if(Integer.parseInt(gotoThis.getText()) >= myCrawler.seed.size() ) {
+        				pic_index = myCrawler.seed.size()-1;
+        			}
+                    this.picture = returnIcon ( new URL ( myCrawler.seed.get ( pic_index ) ) );
+                    this.picture.setImage ( picture.getImage ( ).getScaledInstance ( showPictureJLabel.getWidth ( ) , showPictureJLabel.getHeight ( ) , Image.SCALE_DEFAULT ) );
+                    this.showPictureJLabel.setIcon ( picture );
+                    if(pic_index-1>=0) {
+                    	this.preButton.setEnabled(true);
+                    	this.picturePre = returnIcon ( new URL ( myCrawler.seed.get ( pic_index-1 ) ) );
+                    	System.out.println(myCrawler.seed.get ( pic_index-1 ));
+                    }
+                    else {
+                    	this.preButton.setEnabled(false);
+                    }
+                    if(pic_index+1 < myCrawler.seed.size ( ) ) {
+                    	this.nextButton.setEnabled(true);
+                    	this.pictureNext = returnIcon ( new URL ( myCrawler.seed.get ( pic_index+1 ) ) );
+                    	System.out.println(myCrawler.seed.get ( pic_index+1 ));
+                    }
+                    else {
+                    	this.nextButton.setEnabled(false);
+                    }
+                    picPageLJLabel.setText((pic_index+1)+"/"+(myCrawler.seed.size ( )));
+                }
+                catch ( MalformedURLException e1 ) {
+                    e1.printStackTrace ( );
+                    System.out.println(myCrawler.seed.get ( pic_index+1 ));
+                } 
+                catch ( IOException e1 ) {
+					e1.printStackTrace ( );
+					System.out.println(myCrawler.seed.get ( pic_index+1 ));
+				}
+        	}
+        });
+       
         //next picture
         this.nextButton.addActionListener ( act -> {
             if ( pic_index < myCrawler.seed.size ( )  ) {
@@ -193,6 +255,8 @@ public class UI extends JFrame implements Ibase {
             this.showPictureJLabel.setVisible ( false );
             this.pic_index = 0;
             this.picPageLJLabel.setVisible(false);
+            this.gotoPage.setVisible(false);
+            this.gotoThis.setVisible(false);
             myCrawler.seed.clear ( );
         } );
         //previous picture
@@ -245,8 +309,10 @@ public class UI extends JFrame implements Ibase {
         this.add ( preButton );
         this.add ( backButton );
         this.add ( showPictureJLabel );
+        
         this.add ( picPageLJLabel );
-
+        this.add ( gotoPage );
+        this.add ( gotoThis );
         // show this frame 
         this.setVisible ( true );
     }
@@ -313,6 +379,8 @@ public class UI extends JFrame implements Ibase {
         this.preButton.setVisible ( true );
         this.backButton.setVisible ( true );
         this.showPictureJLabel.setVisible ( true );
+        this.gotoPage.setVisible(true);
+        this.gotoThis.setVisible(true);
         if ( myCrawler.seed.size ( ) != 0 ) {
             try {
             	url = new URL ( myCrawler.seed.get ( pic_index ) );
@@ -391,7 +459,10 @@ public class UI extends JFrame implements Ibase {
     private JButton saveButton = new JButton ( "Save Picture" );
     private JButton preButton = new JButton ( "Previous Picture" );
     private JButton backButton = new JButton ( "Back to MENU" );
+    //
     private JLabel picPageLJLabel = new JLabel();
+    private JButton gotoPage= new JButton("goto");
+    private JTextField gotoThis = new JTextField();
     // 搜尋相關 components
     
     private URL url;

@@ -13,9 +13,19 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Iterator;
 
 import javax.swing.event.*;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,11 +52,20 @@ public class UI extends JFrame implements Ibase {
         this.setLayout ( null );
 
         // init 目前下載位置的 Label 以及 change button 
-        Ibase.initBtn ( this.changeDestDir , 60 , 30 , 10 , height - 60 );
-        Ibase.initLabel ( this.destPathLabel , 100 , 30 , 80 , height - 60 );
-        Ibase.initLabel ( this.currentDestDir , 1000 , 30 , 170 , height - 60 , Controller.destDir );
+        Ibase.initBtn ( this.changeDestDir , 60 , 30 , 10 , height - 70 );
+        Ibase.initLabel ( this.destPathLabel , 100 , 30 , 80 , height - 70 );
+        Ibase.initLabel ( this.currentDestDir , 1000 , 30 , 170 , height - 70 , Controller.destDir );
 
         this.changeDestDir.addActionListener ( act -> this.changeSaveDir ( ) );
+        
+        // certification
+        
+        try {
+        	Turn_off_cert_Validation();
+        } catch (KeyManagementException | NoSuchAlgorithmException e2) {
+		// TODO Auto-generated catch block
+        	e2.printStackTrace();
+        }
 
         // init search button and radio button 
         Ibase.initBtn ( this.searchBtn , 100 , 30 , width - 150 , 100 );
@@ -72,7 +91,7 @@ public class UI extends JFrame implements Ibase {
         Ibase.initBtn ( this.nextButton , 150 , 30 , width - 200 , height - 100 );
         Ibase.initBtn ( this.saveButton , 150 , 30 , width - 200 , height - 150 );
         Ibase.initBtn ( this.preButton , 150 , 30 , width - 350 , height - 100 );
-        Ibase.initBtn ( this.backButton , 150 , 30 , width - 500 , height - 100 );
+        Ibase.initBtn ( this.backButton , 150 , 30 , 10 , height - 100 );
         this.nextButton.setVisible ( false );
         this.saveButton.setVisible ( false );
         this.preButton.setVisible ( false );
@@ -82,6 +101,12 @@ public class UI extends JFrame implements Ibase {
         this.showPictureJLabel.setLocation ( 0 , 0 );
         this.showPictureJLabel.setSize ( width - 100 , height - 100 );
         this.showPictureJLabel.setVisible ( false );
+        
+        //display picture page
+        this.picPageLJLabel.setSize(50, 50);
+        this.picPageLJLabel.setLocation(width-100, 300);
+        this.picPageLJLabel.setVisible(false);
+        this.picPageLJLabel.setText("");
 
         // set events
         this.searchBtn.addActionListener ( act -> {
@@ -121,25 +146,37 @@ public class UI extends JFrame implements Ibase {
         } );
         //next picture
         this.nextButton.addActionListener ( act -> {
-            if ( pic_index < myCrawler.seed.size ( ) - 1 ) {
+            if ( pic_index < myCrawler.seed.size ( )  ) {
                 pic_index++;
                 try {
                     this.picture = pictureNext;
                     this.picture.setImage ( picture.getImage ( ).getScaledInstance ( showPictureJLabel.getWidth ( ) , showPictureJLabel.getHeight ( ) , Image.SCALE_DEFAULT ) );
                     this.showPictureJLabel.setIcon ( picture );
                     if(pic_index-1>=0) {
+                    	this.preButton.setEnabled(true);
                     	this.picturePre = returnIcon ( new URL ( myCrawler.seed.get ( pic_index-1 ) ) );
+                    	System.out.println(myCrawler.seed.get ( pic_index-1 ));
                     }
-                    if(pic_index+1 < myCrawler.seed.size ( ) - 1) {
+                    else {
+                    	this.preButton.setEnabled(false);
+                    }
+                    if(pic_index+1 < myCrawler.seed.size ( ) ) {
+                    	this.nextButton.setEnabled(true);
                     	this.pictureNext = returnIcon ( new URL ( myCrawler.seed.get ( pic_index+1 ) ) );
+                    	System.out.println(myCrawler.seed.get ( pic_index+1 ));
                     }
-                    
+                    else {
+                    	this.nextButton.setEnabled(false);
+                    }
+                    picPageLJLabel.setText((pic_index+1)+"/"+(myCrawler.seed.size ( )));
                 }
                 catch ( MalformedURLException e1 ) {
                     e1.printStackTrace ( );
+                    System.out.println(myCrawler.seed.get ( pic_index+1 ));
                 } 
                 catch ( IOException e1 ) {
 					e1.printStackTrace ( );
+					System.out.println(myCrawler.seed.get ( pic_index+1 ));
 				}
             }
         } );
@@ -155,6 +192,7 @@ public class UI extends JFrame implements Ibase {
             this.backButton.setVisible ( false );
             this.showPictureJLabel.setVisible ( false );
             this.pic_index = 0;
+            this.picPageLJLabel.setVisible(false);
             myCrawler.seed.clear ( );
         } );
         //previous picture
@@ -166,11 +204,20 @@ public class UI extends JFrame implements Ibase {
                     this.picture.setImage ( picture.getImage ( ).getScaledInstance ( showPictureJLabel.getWidth ( ) , showPictureJLabel.getHeight ( ) , Image.SCALE_DEFAULT ) );
                     this.showPictureJLabel.setIcon ( picture );
                     if(pic_index-1>=0) {
-                    	this.picturePre = returnIcon( new URL ( myCrawler.seed.get ( pic_index - 1 ) ) );
+                    	this.preButton.setEnabled(true);
+                    	this.picturePre = returnIcon ( new URL ( myCrawler.seed.get ( pic_index-1 ) ) );
                     }
-                    if(pic_index+1 < myCrawler.seed.size ( ) - 1) {
-                    	this.pictureNext = returnIcon( new URL ( myCrawler.seed.get ( pic_index + 1 ) ) );
+                    else {
+                    	this.preButton.setEnabled(false);
                     }
+                    if(pic_index+1 < myCrawler.seed.size ( ) ) {
+                    	this.nextButton.setEnabled(true);
+                    	this.pictureNext = returnIcon ( new URL ( myCrawler.seed.get ( pic_index+1 ) ) );
+                    }
+                    else {
+                    	this.nextButton.setEnabled(false);
+                    }
+                    picPageLJLabel.setText((pic_index+1)+"/"+(myCrawler.seed.size ( )));
                 }
                 catch ( MalformedURLException e1 ) {
                     e1.printStackTrace ( );
@@ -198,12 +245,51 @@ public class UI extends JFrame implements Ibase {
         this.add ( preButton );
         this.add ( backButton );
         this.add ( showPictureJLabel );
+        this.add ( picPageLJLabel );
 
         // show this frame 
         this.setVisible ( true );
     }
+    
+    // skip some Certification Validation. Check it out on https://stackoverflow.com/questions/4325263/how-to-import-a-cer-certificate-into-a-java-keystore
 
-    private void search ( String keywords ) throws Exception {
+    private void Turn_off_cert_Validation() throws KeyManagementException, NoSuchAlgorithmException {
+    	TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() 
+    		{
+	            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+	                return null;
+	            }
+				@Override
+				public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+					// TODO Auto-generated method stub
+					
+				}
+				@Override
+				public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+					// TODO Auto-generated method stub
+					
+				}
+    		}
+	    };
+	
+	    // Install the all-trusting trust manager
+	    SSLContext sc = SSLContext.getInstance("SSL");
+	    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+	    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+	
+	    // Create all-trusting host name verifier
+	    HostnameVerifier allHostsValid = new HostnameVerifier() {
+	    	@Override
+	        public boolean verify(String hostname, SSLSession session) {
+	            return true;
+	        }
+	    };
+
+    	// Install the all-trusting host verifier
+    	HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+	}
+
+	private void search ( String keywords ) throws Exception {
         System.out.println ( "SEARCH : " + keywords );
 
         int mode = 0;
@@ -234,11 +320,22 @@ public class UI extends JFrame implements Ibase {
                 this.picture = returnIcon(url);
                 this.picture.setImage ( picture.getImage ( ).getScaledInstance ( showPictureJLabel.getWidth ( ) , showPictureJLabel.getHeight ( ) , Image.SCALE_DEFAULT ) );
                 this.showPictureJLabel.setIcon ( picture );
-                if(pic_index+1 < myCrawler.seed.size ( ) - 1) {
-                	this.pictureNext = new ImageIcon ( new URL ( myCrawler.seed.get ( pic_index +1) ) );
-                	//this.pictureNext.setImage ( picture.getImage ( ).getScaledInstance ( showPictureJLabel.getWidth ( ) , showPictureJLabel.getHeight ( ) , Image.SCALE_DEFAULT ) );
-                	//this.showPictureJLabel.setIcon ( picture );
+                if(pic_index-1>=0) {
+                	this.preButton.setEnabled(true);
+                	this.picturePre = returnIcon ( new URL ( myCrawler.seed.get ( pic_index-1 ) ) );
                 }
+                else {
+                	this.preButton.setEnabled(false);
+                }
+                if(pic_index+1 < myCrawler.seed.size ( ) ) {
+                	this.nextButton.setEnabled(true);
+                	this.pictureNext = returnIcon ( new URL ( myCrawler.seed.get ( pic_index+1 ) ) );
+                }
+                else {
+                	this.nextButton.setEnabled(false);
+                }
+                picPageLJLabel.setVisible(true);
+                picPageLJLabel.setText((pic_index+1)+"/"+(myCrawler.seed.size ( )));
             }
             catch ( Exception e ) {
                 e.printStackTrace ( );
@@ -294,6 +391,7 @@ public class UI extends JFrame implements Ibase {
     private JButton saveButton = new JButton ( "Save Picture" );
     private JButton preButton = new JButton ( "Previous Picture" );
     private JButton backButton = new JButton ( "Back to MENU" );
+    private JLabel picPageLJLabel = new JLabel();
     // 搜尋相關 components
     
     private URL url;

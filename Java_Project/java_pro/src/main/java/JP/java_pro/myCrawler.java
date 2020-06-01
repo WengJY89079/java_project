@@ -13,7 +13,9 @@ import edu.uci.ics.crawler4j.url.WebURL;
 import java.util.*;
 
 public class myCrawler extends WebCrawler{
-	public int Page = 2;
+	public static int Page = 2;
+	public static int imgLimit = 50;
+	public static int count = 0;
 	private final static Pattern FILTERS = Pattern.compile(".*(.(gif|jpe?g|png))"); // imgur filters
 	public static List<String> seed = new ArrayList<String>();
 	@Override
@@ -32,9 +34,10 @@ public class myCrawler extends WebCrawler{
 			String html = htmlParseData.getHtml();
 			Set<WebURL> links = htmlParseData.getOutgoingUrls();
 			Iterator<WebURL> linkIterator = links.iterator();
-			while ( linkIterator.hasNext() ) {
+			while ( linkIterator.hasNext() && count < imgLimit) {
 				String nextLinkUrl = linkIterator.next().toString();
-				if(FILTERS.matcher(nextLinkUrl).matches() && !nextLinkUrl.contains("bbs/C_Chat/search?q=")) {
+				if(FILTERS.matcher(nextLinkUrl).matches() && !nextLinkUrl.contains("bbs/C_Chat/search?q=") ) {
+					++count;
 					seed.add(nextLinkUrl);
 				}
 				if (nextLinkUrl.contains("?page=" + Page) ) {

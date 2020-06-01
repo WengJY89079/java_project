@@ -46,7 +46,7 @@ public class Controller extends Thread {
 
 		seedNext = new ArrayList < String > ( );
 		crawlStorageFolder = System.getProperty ( "user.dir" ) + "/CrawlerDatas/";
-		numberOfCrawlers = 1;
+		numberOfCrawlers = 7;
 		config = new CrawlConfig ( );
 		config.setCrawlStorageFolder ( crawlStorageFolder );
 		pageFetcher = new PageFetcher ( config );

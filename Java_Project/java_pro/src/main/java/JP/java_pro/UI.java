@@ -2,8 +2,10 @@ package JP.java_pro;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.*;
@@ -28,6 +30,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+
+import com.sleepycat.je.rep.monitor.NewMasterEvent;
 
 public class UI extends JFrame implements Ibase {
     //check if a string is a number
@@ -77,7 +81,12 @@ public class UI extends JFrame implements Ibase {
             // TODO Auto-generated catch block
             e2.printStackTrace ( );
         }
-
+        //starting background
+        //this.background.setLocation(0,-17);
+        this.backg.setBounds(0,0,backGroundPic1.getIconWidth(), backGroundPic1.getIconHeight());
+        this.backg.setSize(width, height);
+        this.backg.setVisible(true);
+        this.backg.setIcon( backGroundPic1 );
         // init search button and radio button 
         Ibase.initBtn ( this.searchBtn , 100 , 30 , width - 150 , 100 );
         Ibase.initRBtn ( this.searchByKeywords , 100 , 20 , 10 , 80 );
@@ -90,6 +99,10 @@ public class UI extends JFrame implements Ibase {
         this.maxImgs.setLocation ( width - 150 , 50 );
         this.maxImgs.setSize ( 100 , 30 );
         this.maxImgs.setText ( "-1" );
+        
+        this.maxImgs_label.setLocation( width - 150 , 30 );
+        this.maxImgs_label.setSize ( 100 , 20 );
+        this.maxImgs_label.setText ( "圖片搜尋數量上限" );
 
         // loading text
         this.loadIcon.setImage ( loadIcon.getImage ( ).getScaledInstance ( width , height , Image.SCALE_DEFAULT ) );
@@ -131,7 +144,10 @@ public class UI extends JFrame implements Ibase {
 
         // set events
         this.searchBtn.addActionListener ( act -> {
+        	((JPanel)this.getContentPane()).setOpaque(true);
+        	//backg.setVisible( false );
             maxImgs.setVisible ( false );
+            maxImgs_label.setVisible( false );
             changeDestDir.setEnabled ( false );
             inputBox.setVisible ( false );
             searchBtn.setVisible ( false );
@@ -250,6 +266,7 @@ public class UI extends JFrame implements Ibase {
         //back to main MENU
         this.backButton.addActionListener ( act -> {
             this.maxImgs.setVisible ( true );
+            this.maxImgs_label.setVisible( true );
             this.inputBox.setVisible ( true );
             this.searchBtn.setVisible ( true );
             this.searchByKeywords.setVisible ( true );
@@ -263,6 +280,7 @@ public class UI extends JFrame implements Ibase {
             this.picPageLJLabel.setVisible ( false );
             this.gotoPage.setVisible ( false );
             this.gotoThis.setVisible ( false );
+        	((JPanel)this.getContentPane()).setOpaque(false);
             myCrawler.seed.clear ( );
         } );
         //previous picture
@@ -300,11 +318,13 @@ public class UI extends JFrame implements Ibase {
 
         // add components 
         this.add ( destPathLabel );
+        this.getLayeredPane().add( backg, new Integer(Integer.MIN_VALUE));
         this.add ( currentDestDir );
         this.add ( changeDestDir );
 
         this.add ( searchBtn );
         this.add ( maxImgs );
+        this.add ( maxImgs_label );
         this.add ( inputBox );
         this.add ( loadingJLabel );
 
@@ -320,6 +340,8 @@ public class UI extends JFrame implements Ibase {
         this.add ( picPageLJLabel );
         this.add ( gotoPage );
         this.add ( gotoThis );
+
+        ((JPanel)this.getContentPane()).setOpaque(false);
         // show this frame 
         this.setVisible ( true );
     }
@@ -458,6 +480,8 @@ public class UI extends JFrame implements Ibase {
     /* Method END  */
 
     // 
+    private JLabel backg = new JLabel();
+    private ImageIcon backGroundPic1 = new ImageIcon( "./icon/BackGroundPic1.jpg" );
     private Controller main_controller = null;
     private int pic_index = 0;
     private JLabel showPictureJLabel = new JLabel ( );
@@ -477,6 +501,7 @@ public class UI extends JFrame implements Ibase {
     // 搜尋相關 components
 
     private JTextField maxImgs = new JTextField ( );
+    private JLabel maxImgs_label = new JLabel();
 
     private URL url;
 

@@ -5,7 +5,7 @@ import java.io.File;
 public class Main {
     public static void main ( String[] args ) {
         // init UI 
-        UI mainUI = new UI ( "C_Chat Image Crawler", 600, 500 );
+        UI mainUI = new UI ( "C_Chat Image Crawler", 750, 500 );
         // 
     }
 }

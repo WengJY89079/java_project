@@ -66,12 +66,29 @@ public class UI extends JFrame implements Ibase {
         this.setLayout ( null );
 
         // init 目前下載位置的 Label 以及 change button 
-        Ibase.initBtn ( this.changeDestDir , 60 , 30 , 10 , height - 70 );
-        Ibase.initLabel ( this.destPathLabel , 100 , 30 , 80 , height - 70 );
-        Ibase.initLabel ( this.currentDestDir , 1000 , 30 , 170 , height - 70 , Controller.destDir );
-
+        Ibase.initBtn ( this.changeDestDir , 60 , 30 , 80 , height - 70 );
+        Ibase.initBtn ( this.hide , 60 , 30 , 10 , height - 70 );
+        Ibase.initLabel ( this.destPathLabel , 100 , 30 , 150 , height - 70 );
+        Ibase.initLabel ( this.currentDestDir , 1000 , 30 , 240 , height - 70 , Controller.destDir );
+        this.destPathLabel.setForeground(Color.yellow);
+        this.currentDestDir.setForeground(Color.yellow);
         this.changeDestDir.addActionListener ( act -> this.changeSaveDir ( ) );
 
+        this.hide.addActionListener(act->{
+        	times++;
+        	if(times%2==0) {
+        		this.destPathLabel.setVisible( false );
+        		this.currentDestDir.setVisible( false );
+        		this.changeDestDir.setVisible( false );
+        		this.hide.setText("顯示");
+        	}
+        	else {
+        		this.destPathLabel.setVisible( true );
+            	this.currentDestDir.setVisible( true );
+            	this.changeDestDir.setVisible( true );
+            	this.hide.setText("隱藏");
+        	}
+        });
         // certification
 
         try {
@@ -83,26 +100,31 @@ public class UI extends JFrame implements Ibase {
         }
         //starting background
         //this.background.setLocation(0,-17);
-        this.backg.setBounds(0,0,backGroundPic1.getIconWidth(), backGroundPic1.getIconHeight());
+        this.backg.setBounds(0,-25,backGroundPic1.getIconWidth(), backGroundPic1.getIconHeight());
         this.backg.setSize(width, height);
         this.backg.setVisible(true);
         this.backg.setIcon( backGroundPic1 );
         // init search button and radio button 
-        Ibase.initBtn ( this.searchBtn , 100 , 30 , width - 150 , 100 );
-        Ibase.initRBtn ( this.searchByKeywords , 100 , 20 , 10 , 80 );
-        Ibase.initRBtn ( this.searchByAuthor , 100 , 20 , 10 , 120 );
+        Ibase.initBtn ( this.searchBtn , 100 , 30 , width - 150 , 75 );
+        Ibase.initRBtn ( this.searchByKeywords , 100 , 20 , 10 , 75 );
+        Ibase.initRBtn ( this.searchByAuthor , 100 , 20 , 10 , 115 );
+        this.searchByAuthor.setOpaque(false);
+        this.searchByKeywords.setOpaque(false);
+        this.searchByAuthor.setForeground(Color.white);
+        this.searchByKeywords.setForeground(Color.white);
         this.searchByKeywords.setSelected ( true );
 
         this.radioBtnGrp.add ( this.searchByKeywords );
         this.radioBtnGrp.add ( this.searchByAuthor );
 
-        this.maxImgs.setLocation ( width - 150 , 50 );
+        this.maxImgs.setLocation ( 10 , 170);
         this.maxImgs.setSize ( 100 , 30 );
         this.maxImgs.setText ( "-1" );
         
-        this.maxImgs_label.setLocation( width - 150 , 30 );
-        this.maxImgs_label.setSize ( 100 , 20 );
+        this.maxImgs_label.setLocation( 10 , 145 );
+        this.maxImgs_label.setSize ( 120 , 20 );
         this.maxImgs_label.setText ( "圖片搜尋數量上限" );
+        this.maxImgs_label.setForeground(Color.white);
 
         // loading text
         this.loadIcon.setImage ( loadIcon.getImage ( ).getScaledInstance ( width , height , Image.SCALE_DEFAULT ) );
@@ -141,7 +163,17 @@ public class UI extends JFrame implements Ibase {
         this.gotoThis.setSize ( 45 , 20 );
         this.gotoThis.setLocation ( width - 65 , 300 );
         this.gotoThis.setVisible ( false );
-
+        
+        // set author backpic
+        this.searchByAuthor.addActionListener(act->{
+        	this.backg.setIcon( backGroundPic2 );
+        });
+        
+        // set keyword backpic
+        this.searchByKeywords.addActionListener(act->{
+        	this.backg.setIcon( backGroundPic1 );
+        });
+        
         // set events
         this.searchBtn.addActionListener ( act -> {
         	((JPanel)this.getContentPane()).setOpaque(true);
@@ -154,6 +186,11 @@ public class UI extends JFrame implements Ibase {
             searchByKeywords.setVisible ( false );
             searchByAuthor.setVisible ( false );
             loadingJLabel.setVisible ( true );
+            hide.setVisible(false);
+            hide.setEnabled(false);
+            this.destPathLabel.setVisible( false );
+    		this.currentDestDir.setVisible( false );
+    		this.changeDestDir.setVisible( false );
 
             try {
                 this.search ( this.inputBox.getText ( ) );
@@ -280,6 +317,20 @@ public class UI extends JFrame implements Ibase {
             this.picPageLJLabel.setVisible ( false );
             this.gotoPage.setVisible ( false );
             this.gotoThis.setVisible ( false );
+
+            hide.setVisible(true);
+            hide.setEnabled(true);
+            if(times%2==0) {
+            this.destPathLabel.setVisible( false );
+    		this.currentDestDir.setVisible( false );
+    		this.changeDestDir.setVisible( false );
+            }
+            else {
+            	this.destPathLabel.setVisible( true );
+        		this.currentDestDir.setVisible( true );
+        		this.changeDestDir.setVisible( true );
+            }
+            
         	((JPanel)this.getContentPane()).setOpaque(false);
             myCrawler.seed.clear ( );
         } );
@@ -327,6 +378,7 @@ public class UI extends JFrame implements Ibase {
         this.add ( maxImgs_label );
         this.add ( inputBox );
         this.add ( loadingJLabel );
+        this.add ( hide );
 
         this.add ( searchByKeywords );
         this.add ( searchByAuthor );
@@ -407,14 +459,29 @@ public class UI extends JFrame implements Ibase {
     public void finishCraw ( ) {
         this.changeDestDir.setEnabled ( true );
         this.loadingJLabel.setVisible ( false );
-        this.nextButton.setVisible ( true );
-        this.saveButton.setVisible ( true );
-        this.preButton.setVisible ( true );
         this.backButton.setVisible ( true );
-        this.showPictureJLabel.setVisible ( true );
-        this.gotoPage.setVisible ( true );
-        this.gotoThis.setVisible ( true );
         if ( myCrawler.seed.size ( ) != 0 ) {
+        	this.nextButton.setVisible ( true );
+            this.saveButton.setVisible ( true );
+            this.preButton.setVisible ( true );
+            this.showPictureJLabel.setVisible ( true );
+            this.gotoPage.setVisible ( true );
+            this.gotoThis.setVisible ( true );
+            this.showPictureJLabel.setLocation ( 0 , 0 );
+            this.showPictureJLabel.setSize ( 750 - 100 , 500 - 100 );
+            
+            hide.setVisible(true);
+            hide.setEnabled(true);
+            if(times%2==0) {
+            this.destPathLabel.setVisible( false );
+    		this.currentDestDir.setVisible( false );
+    		this.changeDestDir.setVisible( false );
+            }
+            else {
+            	this.destPathLabel.setVisible( true );
+        		this.currentDestDir.setVisible( true );
+        		this.changeDestDir.setVisible( true );
+            }
             try {
                 url = new URL ( myCrawler.seed.get ( pic_index ) );
 
@@ -444,6 +511,16 @@ public class UI extends JFrame implements Ibase {
         }
         else {
             System.out.println ( "no pic" );
+            this.showPictureJLabel.setLocation ( 0 , -25 );
+            this.showPictureJLabel.setVisible ( true );
+            this.showPictureJLabel.setSize ( 750 , 500 );
+            if ( this.searchByKeywords.isSelected ( ) ) {           	
+            	this.showPictureJLabel.setIcon ( backGroundPic1_2 );
+            }
+            else if ( this.searchByAuthor.isSelected ( ) ) {
+            	this.showPictureJLabel.setIcon ( backGroundPic2_2 );
+            }
+            
         }
     }
 
@@ -482,6 +559,9 @@ public class UI extends JFrame implements Ibase {
     // 
     private JLabel backg = new JLabel();
     private ImageIcon backGroundPic1 = new ImageIcon( "./icon/BackGroundPic1.jpg" );
+    private ImageIcon backGroundPic2 = new ImageIcon( "./icon/BackGroundPic2.jpg" );
+    private ImageIcon backGroundPic1_2 = new ImageIcon( "./icon/BackGroundPic1_2.jpg" );
+    private ImageIcon backGroundPic2_2 = new ImageIcon( "./icon/BackGroundPic2_2.jpg" );
     private Controller main_controller = null;
     private int pic_index = 0;
     private JLabel showPictureJLabel = new JLabel ( );
@@ -494,6 +574,7 @@ public class UI extends JFrame implements Ibase {
     private JButton saveButton = new JButton ( "Save Picture" );
     private JButton preButton = new JButton ( "Previous Picture" );
     private JButton backButton = new JButton ( "Back to MENU" );
+    private JButton hide = new JButton ( "隱藏" );
     //
     private JLabel picPageLJLabel = new JLabel ( );
     private JButton gotoPage = new JButton ( "goto" );
@@ -514,7 +595,8 @@ public class UI extends JFrame implements Ibase {
 
     public static final int SearchKeywords = 0;
     public static final int SearchAuthor = 1;
-
+    //隱藏
+    int times=1;
     // Default path 
     private JButton changeDestDir = new JButton ( "更改" );
     private JLabel destPathLabel = new JLabel ( "目前下載目錄 : " );

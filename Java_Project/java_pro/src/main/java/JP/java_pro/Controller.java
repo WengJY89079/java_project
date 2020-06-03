@@ -36,8 +36,9 @@ public class Controller extends Thread {
 	public Controller ( UI ui, String keywords, int mode ) throws Exception {
 		this.ui = ui;
 		this.keywords = keywords;
-		this.init ( );
 		this.mode = mode;
+		System.out.println(mode);
+		this.init ( );
 	}
 
 	// some init and start run()
@@ -83,11 +84,16 @@ public class Controller extends Thread {
 
 	public void run ( ) {
 		// search title
-		if ( mode == 0 )
+		myCrawler.count = 0;
+		if ( mode == 0 ) {
+			System.out.println( "https://www.ptt.cc/bbs/C_Chat/search?q=" + keywords );
 			controller.addSeed ( "https://www.ptt.cc/bbs/C_Chat/search?q=" + keywords );
+		}
 		// search author 
-		else if ( mode == 1 )
+		else if ( mode == 1 ) {
+			System.out.println( "https://www.ptt.cc/bbs/C_Chat/search?q=author:" + keywords );
 			controller.addSeed ( "https://www.ptt.cc/bbs/C_Chat/search?q=author:" + keywords );
+		}
 
 		controller.start ( myCrawler.class , numberOfCrawlers );
 
